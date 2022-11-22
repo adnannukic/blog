@@ -4,25 +4,54 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const _ = require("lodash");
+const mongoose = require("mongoose");
 
 
-const homeStartingContent = "Lacus vel facilisis volutpat est velit egestas dui id ornare. Semper auctor neque vitae tempus quam. Sit amet cursus sit amet dictum sit amet justo. Viverra tellus in hac habitasse. Imperdiet proin fermentum leo vel orci porta. Donec ultrices tincidunt arcu non sodales neque sodales ut. Mattis molestie a iaculis at erat pellentesque adipiscing. Magnis dis parturient montes nascetur ridiculus mus mauris vitae ultricies. Adipiscing elit ut aliquam purus sit amet luctus venenatis lectus. Ultrices vitae auctor eu augue ut lectus arcu bibendum at. Odio euismod lacinia at quis risus sed vulputate odio ut. Cursus mattis molestie a iaculis at erat pellentesque adipiscing.";
-const aboutContent = "Hac habitasse platea dictumst vestibulum rhoncus est pellentesque. Dictumst vestibulum rhoncus est pellentesque elit ullamcorper. Non diam phasellus vestibulum lorem sed. Platea dictumst quisque sagittis purus sit. Egestas sed sed risus pretium quam vulputate dignissim suspendisse. Mauris in aliquam sem fringilla. Semper risus in hendrerit gravida rutrum quisque non tellus orci. Amet massa vitae tortor condimentum lacinia quis vel eros. Enim ut tellus elementum sagittis vitae. Mauris ultrices eros in cursus turpis massa tincidunt dui.";
-const contactContent = "Scelerisque eleifend donec pretium vulputate sapien. Rhoncus urna neque viverra justo nec ultrices. Arcu dui vivamus arcu felis bibendum. Consectetur adipiscing elit duis tristique. Risus viverra adipiscing at in tellus integer feugiat. Sapien nec sagittis aliquam malesuada bibendum arcu vitae. Consequat interdum varius sit amet mattis. Iaculis nunc sed augue lacus. Interdum posuere lorem ipsum dolor sit amet consectetur adipiscing elit. Pulvinar elementum integer enim neque. Ultrices gravida dictum fusce ut placerat orci nulla. Mauris in aliquam sem fringilla ut morbi tincidunt. Tortor posuere ac ut consequat semper viverra nam libero.";
+const homeStartingContent = "Welcome to a simple project called 'Daily Journal'. Here you will find posts on various topics.";
+const aboutContent = "My love affair with coding started when I finished my studies at FET; I studied in the field of ' Electric power networks and systems'; the path I was on until then had almost nothing to do with coding. That love reaches its peak through the BILD IT program. I've found that coding makes me happier, more enthusiastic, more curious, and more enlightened. Through this process I realized that this is what I want to do for a living. I will continue to learn and expand my knowledge and definitely at some point go for a master's degree in this field. This is a simple application that I made in the process of learning.";
+const contactPho1 = "+387603027691";
+const contactPho2 = "+387644057974";
+const contactEmail = "adnannukic3@gmail.com";
+const adress = "Stari Đurđevik, Nukići bb";
 
 const app = express();
-
-const posts = [];
 
 app.set('view engine', 'ejs');
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
+
+//MONGOOSE:
+mongoose.connect("mongodb+srv://admin-adnan:Test123@cluster0.0wdlqcf.mongodb.net/blogDB");
+
+const postSchema = {
+  title: String,
+  intro: String,
+  section1Title: String,
+  section1: String,
+  section2Title: String,
+  section2: String,
+  section3Title: String,
+  section3: String,
+  conclusionTitle: String,
+  conclusion: String
+};
+
+const Post = mongoose.model("Post", postSchema);
+
+
 //HOME PAGE:
 app.get("/", function (req, res) {
   
-  res.render("home", { homePageContent: homeStartingContent, postsList: posts });
+  Post.find({}, function(err, posts){
+    if (err) {
+      console.log(err);
+  } else {
+    res.render("home", { homePageContent: homeStartingContent, postsList: posts});
+  }
+  });
+
 });
 
 //ABOUT PAGE:
@@ -34,7 +63,7 @@ app.get("/about", function (req, res) {
 //CONTACT PAGE:
 app.get("/contact", function (req, res) {
 
-  res.render("contact", { contactPageContent: contactContent });
+  res.render("contact", { contactPhone1: contactPho1, contactPhone2: contactPho2, contactEMail: contactEmail, contactAdress: adress });
 });
 
 //COMPOSE PAGE:
@@ -47,22 +76,46 @@ app.get("/compose", function (req, res) {
 app.get("/post/:postName", function (req, res) {
   const requestTitle = _.lowerCase(req.params.postName);
   
-  posts.forEach(function(post) {
+  Post.findOne({title: req.params.postName.replace(/-/g, ' ')}, function(err, post) {
     const storedTitle = _.lowerCase(post.title);
-    if (storedTitle === requestTitle) {
-      res.render("post", {wantedPostTitle: post.title, wantedPostBody: post.body})
-    } 
+    if(!err && storedTitle === requestTitle) {
+      res.render("post", {wantedPostTitle: post.title, wantedPostIntro: post.intro, wantedPostSection1Title: post.section1Title, wantedPostSection1: post.section1, wantedPostSection2Title: post.section2Title, wantedPostSection2: post.section2, wantedPostSection3Title: post.section3Title, wantedPostSection3: post.section3, wantedPostConclusionTitle: post.conclusionTitle, wantedPostConclusion: post.conclusion})
+    }
   });
 });
 
 //POST FROM COMPOSE TO HOME
 app.post("/compose", function (req, res) {
-  const newPost = {
-    title: req.body.newPostTitle,
-    body: req.body.newPostText
-  }
-  posts.push(newPost);
-  res.redirect("/");
+  const newPostTitle = req.body.newPostTitle;
+  const newPostIntro = req.body.newPostIntro;
+  const newPostSection1Title = req.body.newPostSection1Title;
+  const newPostSection1 = req.body.newPostSection1;
+  const newPostSection2Title = req.body.newPostSection2Title;
+  const newPostSection2 = req.body.newPostSection2;
+  const newPostSection3Title = req.body.newPostSection3Title;
+  const newPostSection3 = req.body.newPostSection3;
+  const newPostConclusionTitle = req.body.newPostConclusionTitle;
+  const newPostConclusion = req.body.newPostConclusion;
+
+
+  const newPost = new Post ({
+    title: newPostTitle,
+    intro: newPostIntro,
+    section1Title: newPostSection1Title,
+    section1: newPostSection1,
+    section2Title: newPostSection2Title,
+    section2: newPostSection2,
+    section3Title: newPostSection3Title,
+    section3: newPostSection3,
+    conclusionTitle: newPostConclusionTitle,
+    conclusion: newPostConclusion
+  });
+
+  newPost.save(function(err){
+    if(!err) {
+      res.redirect("/");
+    }
+  });
 
 });
 

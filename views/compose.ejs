@@ -4,10 +4,37 @@
 <form action="/compose" method="post">
     
     <div class="form-group">
+
         <label for="title" class="form-label">Title</label>
-        <input class="form-control" type="text" name="newPostTitle" id="title">
-        <label for="post" class="form-label">Post</label>
-        <textarea class="form-control" type="text" name="newPostText" id="post" rows="4"></textarea>
+        <input class="form-control" type="text" name="newPostTitle" id="title" required>
+
+        <label for="post-intro" class="form-label">Post Intro</label>
+        <textarea class="form-control" type="text" name="newPostIntro" id="post-intro" rows="4" required></textarea>
+
+        <label for="title-section1" class="form-label">Section1 Title</label>
+        <input class="form-control" type="text" name="newPostSection1Title" id="title-section1" required>
+
+        <label for="post-section1" class="form-label">Post Section 1</label>
+        <textarea class="form-control" type="text" name="newPostSection1" id="post-section1" rows="4" required></textarea>
+
+        <label for="title-section2" class="form-label">Section2 Title</label>
+        <input class="form-control" type="text" name="newPostSection2Title" id="title-section2" required>
+
+        <label for="post-section2" class="form-label">Post Section 2</label>
+        <textarea class="form-control" type="text" name="newPostSection2" id="post-section2" rows="4" required></textarea>
+
+        <label for="title-section3" class="form-label">Section1 Title</label>
+        <input class="form-control" type="text" name="newPostSection3Title" id="title-section3" required>
+
+        <label for="post-section3" class="form-label">Post Section 3</label>
+        <textarea class="form-control" type="text" name="newPostSection3" id="post-section3" rows="4" required></textarea>
+
+        <label for="title-conclusion" class="form-label">Conclusion Title</label>
+        <input class="form-control" type="text" name="newPostConclusionTitle" id="title-conclusion" required>
+
+        <label for="post-conclusion" class="form-label">Post Conclusion</label>
+        <textarea class="form-control" type="text" name="newPostConclusion" id="post-conclusion" rows="4" required></textarea>
+
     </div>
     <button class="btn btn-primary" type="submit">Publish</button>
 
